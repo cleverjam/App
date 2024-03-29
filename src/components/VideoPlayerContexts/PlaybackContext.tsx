@@ -11,13 +11,17 @@ function PlaybackContextProvider({children}: ChildrenProps) {
     const [currentlyPlayingURL, setCurrentlyPlayingURL] = useState<string | null>(null);
     const [sharedElement, setSharedElement] = useState<View | null>(null);
     const [originalParent, setOriginalParent] = useState<View | null>(null);
+    const [isPlaying, setIsPlaying] = useState(false);
     const currentVideoPlayerRef = useRef<Video | null>(null);
     const {currentReportID} = useCurrentReportID() ?? {};
     const videoResumeTryNumber = useRef(0);
 
     const pauseVideo = useCallback(() => {
+        if (!isPlaying) {
+            return;
+        }
         currentVideoPlayerRef.current?.setStatusAsync?.({shouldPlay: false});
-    }, [currentVideoPlayerRef]);
+    }, [currentVideoPlayerRef, isPlaying]);
 
     const stopVideo = useCallback(() => {
         currentVideoPlayerRef.current?.stopAsync?.();
@@ -98,6 +102,8 @@ function PlaybackContextProvider({children}: ChildrenProps) {
             pauseVideo,
             checkVideoPlaying,
             videoResumeTryNumber,
+            isPlaying,
+            setIsPlaying,
         }),
         [updateCurrentlyPlayingURL, currentlyPlayingURL, originalParent, sharedElement, shareVideoPlayerElements, playVideo, pauseVideo, checkVideoPlaying],
     );
